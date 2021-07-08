@@ -1,4 +1,4 @@
-package io.github.serdeliverance.examples.redbeeconf
+package io.github.redbeeconf.examples
 
 import akka.NotUsed
 import akka.actor.ActorSystem

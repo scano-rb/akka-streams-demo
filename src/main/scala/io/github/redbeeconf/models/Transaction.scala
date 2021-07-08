@@ -1,4 +1,4 @@
-package io.github.serdeliverance.models
+package io.github.redbeeconf.models
 
 case class Transaction(
     amount: BigDecimal,
