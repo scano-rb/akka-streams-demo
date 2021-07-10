@@ -20,5 +20,5 @@ class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transactions")
 }
 
 object TransactionTable {
-  val table = TableQuery[TransactionTable]
+  lazy val transactionTable = TableQuery[TransactionTable]
 }

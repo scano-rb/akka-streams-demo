@@ -17,7 +17,7 @@ val circeVersion    = "0.13.0"
 libraryDependencies ++= Seq(
   // akka streams
   "com.typesafe.akka"  %% "akka-stream"               % AkkaVersion,
-  "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "2.0.2",
+  "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "3.0.2",
   // de acá en adelante, son dependencias de soporte para el ejemplo real world
   "ch.qos.logback"       % "logback-classic" % "1.2.3",
   "io.circe"             %% "circe-core" % circeVersion,

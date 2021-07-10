@@ -50,8 +50,6 @@ object TransactionGenerator extends App with JsonSupport with RandomUtils {
     .toMat(FileIO.toPath(outputFile))(Keep.right)
     .run()
 
-  println(faker.finance().creditCard())
-
   result.onComplete { _ =>
     system.log.info("Data generated")
     system.terminate()
