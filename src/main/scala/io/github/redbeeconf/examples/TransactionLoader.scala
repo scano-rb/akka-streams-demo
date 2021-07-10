@@ -25,7 +25,11 @@ object TransactionLoader extends App with JsonSupport {
   // 3. session de slick y hook para liberar recursos
 
   implicit val session = SlickSession.forConfig("slick-postgres")
-  system.registerOnTermination(session.close())
+
+  system.registerOnTermination {
+    system.log.info(s"Closing slick session")
+    session.close()
+  }
 
   // 4. el grafo
 
