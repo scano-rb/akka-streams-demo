@@ -3,16 +3,16 @@ package io.github.redbeeconf.generator
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{FileIO, Keep, Source}
 import akka.util.ByteString
-import com.github.javafaker.Faker
+import com.github.javafaker.{CreditCardType, Faker}
 import com.typesafe.config.ConfigFactory
 import io.circe.syntax._
-import io.github.redbeeconf.json.JsonSupport
 import io.github.redbeeconf.models.Transaction
+import io.github.redbeeconf.utils.{JsonSupport, RandomUtils}
 
 import java.nio.file.Paths
 import java.time.LocalDateTime
 
-object TransactionGenerator extends App with JsonSupport {
+object TransactionGenerator extends App with JsonSupport with RandomUtils {
 
   implicit val system = ActorSystem("TransactionDataGenerator")
   implicit val ec     = system.dispatcher
@@ -23,22 +23,34 @@ object TransactionGenerator extends App with JsonSupport {
 
   val faker = new Faker()
 
-  val outputFile = Paths.get("annuled-transactions.txt")
+  val outputFile = Paths.get("transactions.txt")
 
   val result = Source(1 to transactionCount)
-    .map(
-      _ =>
-        Transaction(amount = 1000,
-                    cardNumber = "xxxx-xxxx-xxxx-xxxx",
-                    dateTime = LocalDateTime.now().toString,
-                    holder = "pepe",
-                    installments = 4,
-                    cardType = "visa",
-                    email = "pepe"))
+    .map(_ => {
+      val cardType     = CreditCardType.values()(CreditCardType.values().size - 1)
+      val cardNumber   = faker.finance().creditCard(cardType)
+      val user         = faker.name()
+      val holder       = user.fullName()
+      val email        = s"${user.username()}@gmail.com"
+      val amount       = randomIntInRage(1, 9999)
+      val installments = randomIntInRage(1, 12)
+      Transaction(
+        id = None,
+        amount = amount,
+        cardNumber = cardNumber,
+        dateTime = LocalDateTime.now().toString,
+        holder = holder,
+        installments = installments,
+        cardType = cardType.name(),
+        email = email
+      )
+    })
     .map(tx => tx.asJson.noSpaces)
     .map(line => ByteString(line + "\n"))
     .toMat(FileIO.toPath(outputFile))(Keep.right)
     .run()
+
+  println(faker.finance().creditCard())
 
   result.onComplete { _ =>
     system.log.info("Data generated")

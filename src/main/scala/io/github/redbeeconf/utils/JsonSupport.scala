@@ -1,8 +1,8 @@
-package io.github.redbeeconf.json
+package io.github.redbeeconf.utils
 
-import io.circe.{Decoder, Encoder, Printer}
 import io.circe.generic.extras.Configuration
 import io.circe.generic.extras.semiauto.{deriveConfiguredDecoder, deriveConfiguredEncoder}
+import io.circe.{Decoder, Encoder, Printer}
 import io.github.redbeeconf.models.Transaction
 
 trait JsonSupport {
@@ -13,6 +13,6 @@ trait JsonSupport {
   implicit val customPrinter: Printer =
     Printer.noSpaces.copy(dropNullValues = true)
 
-  implicit val transactionEncoder: Encoder[Transaction] = deriveConfiguredEncoder
-  implicit val transactionDecoder: Decoder[Transaction] = deriveConfiguredDecoder
+  implicit val transactionEncoder: Encoder[Transaction] = deriveConfiguredEncoder[Transaction].mapJson(_.dropNullValues)
+  implicit val transactionDecoder: Decoder[Transaction] = deriveConfiguredDecoder[Transaction]
 }

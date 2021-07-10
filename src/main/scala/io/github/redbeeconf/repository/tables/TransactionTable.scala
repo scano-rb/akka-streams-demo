@@ -6,7 +6,7 @@ import slick.lifted.ProvenShape
 
 class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transactions") {
 
-  def id: Rep[Long]           = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def id: Rep[Option[Long]]   = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
   def amount: Rep[BigDecimal] = column[BigDecimal]("amount")
   def cardNumber: Rep[String] = column[String]("card_number")
   def dateTime: Rep[String]   = column[String]("date_time")
@@ -16,7 +16,7 @@ class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transactions")
   def email: Rep[String]      = column[String]("email")
 
   def * : ProvenShape[Transaction] =
-    (amount, cardNumber, dateTime, holder, installments, cardType, email, id).mapTo[Transaction]
+    (id, amount, cardNumber, dateTime, holder, installments, cardType, email).mapTo[Transaction]
 }
 
 object TransactionTable {
