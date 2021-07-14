@@ -34,6 +34,7 @@ object TransactionGenerator extends App with JsonSupport with RandomUtils {
       val email        = s"${user.username()}@gmail.com"
       val amount       = randomIntInRage(1, 9999)
       val installments = randomIntInRage(1, 12)
+      val status       = randomState()
       Transaction(
         id = None,
         amount = amount,
@@ -42,7 +43,8 @@ object TransactionGenerator extends App with JsonSupport with RandomUtils {
         holder = holder,
         installments = installments,
         cardType = cardType.name(),
-        email = email
+        email = email,
+        status = status
       )
     })
     .map(tx => tx.asJson.noSpaces)

@@ -4,12 +4,11 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl.{Slick, SlickSession}
 import akka.stream.scaladsl.FileIO
 import io.circe.parser.decode
+import io.github.redbeeconf.db.TransactionTable.transactionTable
 import io.github.redbeeconf.models.Transaction
-import io.github.redbeeconf.repository.tables.TransactionTable.transactionTable
 import io.github.redbeeconf.utils.JsonSupport
 
 import java.nio.file.Paths
-
 import slick.jdbc.PostgresProfile.api._
 
 object TransactionLoader extends App with JsonSupport {
@@ -40,7 +39,7 @@ object TransactionLoader extends App with JsonSupport {
     .collect {
       case Right(parsedTx) => parsedTx
     }
-    .map(tx => tx.copy(cardNumber = extractLast4digits(tx.cardNumber)))
+    .map(tx => tx.copy(cardNumber = maskCardNumber(tx.cardNumber)))
     .runWith(Slick.sink(tx => transactionTable += tx))
 
   // liberamos recursos
@@ -49,7 +48,6 @@ object TransactionLoader extends App with JsonSupport {
     system.terminate()
   }
 
-  // TODO
-  def extractLast4digits(cardNumber: String): String =
+  def maskCardNumber(cardNumber: String): String =
     s"xxxx-xxxx-xxxx-${cardNumber.substring(cardNumber.length - 4)}"
 }
