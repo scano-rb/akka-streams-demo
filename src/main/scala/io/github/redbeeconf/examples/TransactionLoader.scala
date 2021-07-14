@@ -2,7 +2,8 @@ package io.github.redbeeconf.examples
 
 import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl.{Slick, SlickSession}
-import akka.stream.scaladsl.FileIO
+import akka.stream.scaladsl.{FileIO, Framing}
+import akka.util.ByteString
 import io.circe.parser.decode
 import io.github.redbeeconf.db.TransactionTable.transactionTable
 import io.github.redbeeconf.models.Transaction
@@ -34,6 +35,7 @@ object TransactionLoader extends App with JsonSupport {
 
   val result = FileIO
     .fromPath(file)
+    .via(Framing.delimiter(ByteString("\n"), 256, true))
     .map(_.utf8String)
     .map(decode[Transaction](_))
     .collect {
