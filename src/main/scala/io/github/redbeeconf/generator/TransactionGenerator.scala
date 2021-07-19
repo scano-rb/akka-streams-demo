@@ -27,7 +27,7 @@ object TransactionGenerator extends App with JsonSupport with RandomUtils {
 
   val result = Source(1 to transactionCount)
     .map(_ => {
-      val cardType     = CreditCardType.values()(CreditCardType.values().size - 1)
+      val cardType     = CreditCardType.values()(randomIntInRage(0, CreditCardType.values().size - 1))
       val cardNumber   = faker.finance().creditCard(cardType)
       val user         = faker.name()
       val holder       = user.fullName()
