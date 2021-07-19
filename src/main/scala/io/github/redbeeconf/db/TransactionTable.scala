@@ -1,4 +1,4 @@
-package io.github.redbeeconf.repository.tables
+package io.github.redbeeconf.db
 
 import io.github.redbeeconf.models.Transaction
 import slick.jdbc.PostgresProfile.api._
@@ -14,11 +14,12 @@ class TransactionTable(tag: Tag) extends Table[Transaction](tag, "transactions")
   def installments: Rep[Int]  = column[Int]("installments")
   def cardType: Rep[String]   = column[String]("card_type")
   def email: Rep[String]      = column[String]("email")
+  def status: Rep[String]     = column[String]("status")
 
   def * : ProvenShape[Transaction] =
-    (id, amount, cardNumber, dateTime, holder, installments, cardType, email).mapTo[Transaction]
+    (id, amount, cardNumber, dateTime, holder, installments, cardType, status, email).mapTo[Transaction]
 }
 
 object TransactionTable {
-  val table = TableQuery[TransactionTable]
+  lazy val transactionTable = TableQuery[TransactionTable]
 }
