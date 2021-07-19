@@ -4,15 +4,20 @@ import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl.{Slick, SlickSession}
 import akka.stream.scaladsl.{FileIO, Framing}
 import akka.util.ByteString
+import com.typesafe.config.ConfigFactory
 import io.circe.parser.decode
 import io.github.redbeeconf.db.TransactionTable.transactionTable
 import io.github.redbeeconf.models.Transaction
-import io.github.redbeeconf.utils.JsonSupport
+import io.github.redbeeconf.utils.{EncryptionUtils, JsonSupport}
 
 import java.nio.file.Paths
 import slick.jdbc.PostgresProfile.api._
 
-object TransactionLoader extends App with JsonSupport {
+object TransactionLoader extends App with JsonSupport with EncryptionUtils {
+
+  // 0. Configs
+  val config = ConfigFactory.load()
+  val key    = config.getString("encryption.key")
 
   // 1. infrastructure
   implicit val system = ActorSystem("TransactionLoader")
@@ -41,7 +46,7 @@ object TransactionLoader extends App with JsonSupport {
     .collect {
       case Right(parsedTx) => parsedTx
     }
-    .map(tx => tx.copy(cardNumber = maskCardNumber(tx.cardNumber)))
+    .map(tx => tx.copy(cardNumber = encrypt(key, tx.cardNumber)))
     .runWith(Slick.sink(tx => transactionTable += tx))
 
   // liberamos recursos
@@ -49,7 +54,4 @@ object TransactionLoader extends App with JsonSupport {
     system.log.info("Shutdown actor system")
     system.terminate()
   }
-
-  def maskCardNumber(cardNumber: String): String =
-    s"xxxx-xxxx-xxxx-${cardNumber.substring(cardNumber.length - 4)}"
 }
