@@ -13,6 +13,10 @@ import io.github.redbeeconf.utils.{EncryptionUtils, JsonSupport}
 import java.nio.file.Paths
 import slick.jdbc.PostgresProfile.api._
 
+/**
+  * Ejemplo real world: encriptado de claves en batch asincrónico con volcado hacia la base de datos
+  *
+  */
 object TransactionLoader extends App with JsonSupport with EncryptionUtils {
 
   // 0. Configs
@@ -22,6 +26,7 @@ object TransactionLoader extends App with JsonSupport with EncryptionUtils {
   // 1. infrastructure
   implicit val system = ActorSystem("TransactionLoader")
 
+  // no lo necesitamos para el grafo, pero si para "chainear" sobre el future (`onComplete` method)
   implicit val ec = system.dispatcher
 
   // 2. path al archivo que vamos a leer
@@ -30,11 +35,6 @@ object TransactionLoader extends App with JsonSupport with EncryptionUtils {
   // 3. session de slick y hook para liberar recursos
 
   implicit val session = SlickSession.forConfig("slick-postgres")
-
-  system.registerOnTermination {
-    system.log.info(s"Closing slick session")
-    session.close()
-  }
 
   // 4. el grafo
 
@@ -51,7 +51,14 @@ object TransactionLoader extends App with JsonSupport with EncryptionUtils {
 
   // liberamos recursos
   result.onComplete { _ =>
+    // terminamos el actor system luego de que nuestro stream finalice (es decir, cuando el Future retorna)
     system.log.info("Shutdown actor system")
     system.terminate()
+  }
+
+  // se añade un hook para cerrar la session de slick (es importante liberar recursos!)
+  system.registerOnTermination {
+    system.log.info(s"Closing slick session")
+    session.close()
   }
 }
