@@ -2,16 +2,16 @@ package io.github.redbeeconf.utils
 
 import java.security.MessageDigest
 import java.util
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
-import org.apache.commons.codec.binary.Base64
 
 trait EncryptionUtils {
 
   def encrypt(key: String, value: String): String = {
     val cipher: Cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.ENCRYPT_MODE, keyToSpec(key))
-    Base64.encodeBase64String(cipher.doFinal(value.getBytes("UTF-8")))
+    Base64.getEncoder().encodeToString(cipher.doFinal(value.getBytes("UTF-8")))
   }
 
   def keyToSpec(key: String): SecretKeySpec = {
