@@ -1,14 +1,11 @@
 package io.github.redbeeconf.examples
 
-import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.IOResult
-import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
-import akka.util.ByteString
+import akka.stream.scaladsl.{Sink, Source}
 
-import java.nio.file.Paths
-import scala.concurrent.Future
-
+/**
+  * Primer grafo
+  */
 object Example1 extends App {
 
   implicit val system           = ActorSystem("RedbeeExample")
