@@ -12,6 +12,7 @@ import io.github.redbeeconf.utils.{EncryptionUtils, JsonSupport}
 
 import java.nio.file.Paths
 import slick.jdbc.PostgresProfile.api._
+import io.circe.parser.decode
 
 /**
   * Ejemplo real world: encriptado de claves en batch asincrónico con volcado hacia la base de datos
