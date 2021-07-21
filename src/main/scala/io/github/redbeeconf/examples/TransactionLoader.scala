@@ -40,7 +40,7 @@ object TransactionLoader extends App with JsonSupport with EncryptionUtils {
 
   val result = FileIO
     .fromPath(file)
-    .via(Framing.delimiter(ByteString("\n"), 256, true))
+    .via(Framing.delimiter(ByteString(System.lineSeparator()), 256, true))
     .map(_.utf8String)
     .map(decode[Transaction](_))
     .collect {
